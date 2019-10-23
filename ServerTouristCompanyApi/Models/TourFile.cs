@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ServerTouristCompanyApi.Models
 {
-    public class FooFile : Foo
+    public class TourFile : Tour
     {
         /// <summary>
         /// Gets or set the file content.

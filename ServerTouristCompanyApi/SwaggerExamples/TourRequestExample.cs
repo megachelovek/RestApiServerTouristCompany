@@ -4,11 +4,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace ServerTouristCompanyApi.SwaggerExamples
 {
-    public class FooRequestExample : IExamplesProvider
+    public class TourRequestExample : IExamplesProvider
     {
         public object GetExamples()
         {
-            return new Foo
+            return new Tour
             {
                 Id = new Random().Next(),
                 Value = Guid.NewGuid().ToString().Remove(6)

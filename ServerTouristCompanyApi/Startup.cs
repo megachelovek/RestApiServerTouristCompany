@@ -58,7 +58,7 @@ namespace ServerTouristCompanyApi
             services.AddLogging();
 
             // Register your types
-            services.AddTransient<IFooService, FooService>();
+            services.AddTransient<ITourService, TourService>();
             // Refer to this article if you require more information on CORS
             // https://docs.microsoft.com/en-us/aspnet/core/security/cors
             void build(CorsPolicyBuilder b) { b.WithOrigins("*").WithMethods("*").WithHeaders("*").AllowCredentials().Build(); };
@@ -88,7 +88,7 @@ namespace ServerTouristCompanyApi
 
             services.AddResponseCaching();
 
-            services.AddSwaggerExamplesFromAssemblyOf<FooRequestExample>();
+            services.AddSwaggerExamplesFromAssemblyOf<TourRequestExample>();
 
             services.AddSwaggerGen(c =>
             {
@@ -115,7 +115,7 @@ namespace ServerTouristCompanyApi
         /// 
         /// </summary>
         /// <param name="app"></param>
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseExceptionHandler(options =>
             {
@@ -146,6 +146,21 @@ namespace ServerTouristCompanyApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc();
         }

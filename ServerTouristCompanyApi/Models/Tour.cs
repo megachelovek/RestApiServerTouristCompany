@@ -3,9 +3,9 @@
 namespace ServerTouristCompanyApi.Models
 {
     /// <summary>
-    /// The Foo
+    /// The Tour
     /// </summary>
-    public class Foo
+    public class Tour
     {
         /// <summary>
         /// Gets the creation time.
@@ -18,7 +18,7 @@ namespace ServerTouristCompanyApi.Models
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the Foo value.
+        /// Gets or sets the Tour value.
         /// </summary>
         public string Value { get; set; }
     }
