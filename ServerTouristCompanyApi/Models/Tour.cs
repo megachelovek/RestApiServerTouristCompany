@@ -3,23 +3,43 @@
 namespace ServerTouristCompanyApi.Models
 {
     /// <summary>
-    /// The Tour
+    /// Тур
     /// </summary>
     public class Tour
     {
         /// <summary>
-        /// Gets the creation time.
+        /// Дата создания тура
         /// </summary>
-        public DateTime CreateAd => DateTime.UtcNow;
+        public DateTime Create { get; set; }
 
         /// <summary>
-        /// Gets or sets unique identifier.
+        /// Идентификатор
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the Tour value.
+        /// Название
         /// </summary>
-        public string Value { get; set; }
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Описание
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Из какого города, страны
+        /// </summary>
+        public string FromCity { get; set; }
+
+        /// <summary>
+        /// В какой город, страну
+        /// </summary>
+        public string ToCity { get; set; }
+
+        /// <summary>
+        /// Цена
+        /// </summary>
+        public int Price { get; set; }
     }
 }

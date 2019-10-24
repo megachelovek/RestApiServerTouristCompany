@@ -10,8 +10,9 @@ namespace ServerTouristCompanyApi.SwaggerExamples
         {
             return new Tour
             {
-                Id = new Random().Next(),
-                Value = Guid.NewGuid().ToString().Remove(6)
+                Id = 2, Name = "Пеший тур в Болгарию", Create = new DateTime(2019, 3, 3),
+                Description = "Тур по городам Болгарии ", FromCity = "Москва, Россия", Price = 20000,
+                ToCity = "София, Болгария"
             };
         }
     }

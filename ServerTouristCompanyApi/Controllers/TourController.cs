@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +16,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ServerTouristCompanyApi.Controllers
@@ -105,10 +110,10 @@ namespace ServerTouristCompanyApi.Controllers
         public async Task<IActionResult> Get()
         {
             var response = await _service.Get().ConfigureAwait(false);
-            // Example on how to get configuration values
-            var connections = new List<string> { _connectionStrings.ApiDb, _connectionStrings.Api2Db };
+            
+            List<Tour>  tours = (List<Tour>)new TourListResponseExample().GetExamples();
 
-            return Ok(connections);
+            return Ok(tours);
         }
 
         /// <summary>

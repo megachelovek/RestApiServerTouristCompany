@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ServerTouristCompanyApi.Models;
+using ServerTouristCompanyApi.SwaggerExamples;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace ServerTouristCompanyApi.Controllers
 {
@@ -20,8 +22,13 @@ namespace ServerTouristCompanyApi.Controllers
             new Person { Login="qwerty", Password="55555", Role = "user" }
         };
 
+        /// <summary>
+        /// Для получения в !!Body!! надо добавить username:<имя_пользователя> password:<пароль> 
+        /// После получение токена access_token, его надо прибавить к 'Bearer '+<token> т.е. в Headers -> Authorization:Bearer eyJhbGciOiJIUzI1NiIsIw....
+        /// </summary>
         [HttpPost("/token")]
-        [ProducesResponseType(typeof(int), 201)]
+        [ProducesResponseType(typeof(IEnumerable<AuthResponse>), 200)]
+        [SwaggerRequestExample(typeof(Tour), typeof(AuthExample))]
         [ProducesResponseType(500)]
         public async Task Token()
         {
@@ -50,7 +57,7 @@ namespace ServerTouristCompanyApi.Controllers
             var response = new
             {
                 access_token = encodedJwt,
-                username = identity.Name
+                user = identity.Name
             };
 
             // сериализация ответа
