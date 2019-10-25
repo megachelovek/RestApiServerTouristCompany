@@ -53,11 +53,12 @@ namespace ServerTouristCompanyApi.Controllers
                     expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
+            List<Claim> list = (List<Claim>) identity.Claims;
             var response = new
             {
                 access_token = encodedJwt,
-                user = identity.Name
+                user = identity.Name,
+                role = list[1].Value
             };
 
             // сериализация ответа
