@@ -1,39 +1,38 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using ServerTouristCompanyApi.Configuration;
-using ServerTouristCompanyApi.Middleware;
-using ServerTouristCompanyApi.Services;
-using ServerTouristCompanyApi.SwaggerExamples;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using ServerTouristCompanyApi.Configuration;
 using ServerTouristCompanyApi.Controllers;
+using ServerTouristCompanyApi.Middleware;
+using ServerTouristCompanyApi.Services;
+using ServerTouristCompanyApi.SwaggerExamples;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace ServerTouristCompanyApi
 {
     /// <summary>
-    /// OWIN configuration and setup.
+    ///     OWIN configuration and setup.
     /// </summary>
     public class Startup
     {
         private readonly IHostingEnvironment _env;
 
         /// <summary>
-        /// Initializes new instance of <see cref="Startup"/>
+        ///     Initializes new instance of <see cref="Startup" />
         /// </summary>
         /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
@@ -42,17 +41,16 @@ namespace ServerTouristCompanyApi
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            IConfigurationRoot configuration =
+            var configuration =
                 new ConfigurationBuilder()
                     .SetBasePath(_env.ContentRootPath)
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{_env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.json", false, true)
+                    .AddJsonFile($"appsettings.{_env.EnvironmentName}.json", true, true)
                     .AddEnvironmentVariables()
                     .Build();
 
@@ -62,9 +60,18 @@ namespace ServerTouristCompanyApi
 
             // Register your types
             services.AddTransient<ITourService, TourService>();
+            services.AddTransient<ITransferService, TransferService>();
+            services.AddTransient<IReservationService, ReservationService>();
+            services.AddTransient<ITicketService, TicketService>();
+
             // Refer to this article if you require more information on CORS
             // https://docs.microsoft.com/en-us/aspnet/core/security/cors
-            void build(CorsPolicyBuilder b) { b.WithOrigins("*").WithMethods("*").WithHeaders("*").AllowCredentials().Build(); };
+            void build(CorsPolicyBuilder b)
+            {
+                b.WithOrigins("*").WithMethods("*").WithHeaders("*").AllowCredentials().Build();
+            }
+
+            ;
             services.AddCors(options => { options.AddPolicy("AllowAllPolicy", build); });
 
             ///JWT Bearer
@@ -89,7 +96,7 @@ namespace ServerTouristCompanyApi
                         // установка ключа безопасности
                         IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                         // валидация ключа безопасности
-                        ValidateIssuerSigningKey = true,
+                        ValidateIssuerSigningKey = true
                     };
                 });
             ///JWT Bearer
@@ -111,14 +118,14 @@ namespace ServerTouristCompanyApi
                         //var jsonInputFormatter = options.InputFormatters.OfType<JsonInputFormatter>().First();
                         //jsonInputFormatter.SupportedMediaTypes.Add("multipart/form-data");
                     })
-                .AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.Formatting = Formatting.Indented;
-                });
+                .AddJsonOptions(options => { options.SerializerSettings.Formatting = Formatting.Indented; });
 
             services.AddResponseCaching();
 
             services.AddSwaggerExamplesFromAssemblyOf<TourRequestExample>();
+            services.AddSwaggerExamplesFromAssemblyOf<TicketRequestExample>();
+            services.AddSwaggerExamplesFromAssemblyOf<ReservationRequestExample>();
+            services.AddSwaggerExamplesFromAssemblyOf<TransferRequestExample>();
 
             services.AddSwaggerGen(c =>
             {
@@ -128,10 +135,11 @@ namespace ServerTouristCompanyApi
                     Title = "My API",
                     Description = "My API",
                     TermsOfService = "None",
-                    Contact = new Contact { Name = "Name Surname", Email = "email@gmail.com", Url = "" }
+                    Contact = new Contact {Name = "Name Surname", Email = "email@gmail.com", Url = ""}
                 });
 
-                c.IncludeXmlComments(Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, $"{PlatformServices.Default.Application.ApplicationName}.xml"));
+                c.IncludeXmlComments(Path.Combine(PlatformServices.Default.Application.ApplicationBasePath,
+                    $"{PlatformServices.Default.Application.ApplicationName}.xml"));
                 c.DescribeAllEnumsAsStrings();
 
                 c.ExampleFilters();
@@ -142,7 +150,6 @@ namespace ServerTouristCompanyApi
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="app"></param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -160,9 +167,10 @@ namespace ServerTouristCompanyApi
                         using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, true, 1024, true))
                         {
                             var body = await reader.ReadToEndAsync().ConfigureAwait(false);
-                            var exceptionHandler = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+                            var exceptionHandler = context.Features.Get<IExceptionHandlerFeature>();
 
-                            loggerFactory.LogError(exceptionHandler.Error, "Error: {0}. Request: {1}", exceptionHandler.Error.Message, body);
+                            loggerFactory.LogError(exceptionHandler.Error, "Error: {0}. Request: {1}",
+                                exceptionHandler.Error.Message, body);
                         }
                     });
             });
@@ -176,7 +184,7 @@ namespace ServerTouristCompanyApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
-            
+
             app.UseAuthentication();
             app.UseMvc();
         }

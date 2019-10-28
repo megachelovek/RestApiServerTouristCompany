@@ -1,9 +1,8 @@
-﻿using System;
-
-namespace ServerTouristCompanyApi.Models
+﻿namespace ServerTouristCompanyApi.Models
 {
     /// <summary>
-    /// В access_token будет string его надо прибавить к 'Bearer '+<token> т.е. в Headers -> Authorization:Bearer eyJhbGciOiJIUzI1NiIsIw....
+    ///     В access_token будет string его надо прибавить к 'Bearer '+
+    ///     <token> т.е. в Headers -> Authorization:Bearer eyJhbGciOiJIUzI1NiIsIw....
     /// </summary>
     public class AuthResponse
     {

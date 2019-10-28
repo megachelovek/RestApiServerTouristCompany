@@ -3,42 +3,42 @@
 namespace ServerTouristCompanyApi.Models
 {
     /// <summary>
-    /// Тур
+    ///     Тур
     /// </summary>
     public class Tour
     {
         /// <summary>
-        /// Дата создания тура
+        ///     Дата создания тура
         /// </summary>
         public DateTime Create { get; set; }
 
         /// <summary>
-        /// Идентификатор
+        ///     Идентификатор
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Название
+        ///     Название
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Описание
+        ///     Описание
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Из какого города, страны
+        ///     Из какого города, страны
         /// </summary>
         public string FromCity { get; set; }
 
         /// <summary>
-        /// В какой город, страну
+        ///     В какой город, страну
         /// </summary>
         public string ToCity { get; set; }
 
         /// <summary>
-        /// Цена
+        ///     Цена
         /// </summary>
         public int Price { get; set; }
     }

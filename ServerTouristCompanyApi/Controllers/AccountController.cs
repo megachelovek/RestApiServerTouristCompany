@@ -16,15 +16,19 @@ namespace ServerTouristCompanyApi.Controllers
 {
     public class AccountController : Controller
     {
-        private List<Person> people = new List<Person>
+        private readonly List<Person> people = new List<Person>
         {
-            new Person {Login="admin", Password="admin", Role = "admin" },
-            new Person { Login="qwerty", Password="55555", Role = "user" }
+            new Person {Login = "admin", Password = "admin", Role = "admin"},
+            new Person {Login = "qwerty", Password = "55555", Role = "user"}
         };
 
         /// <summary>
-        /// Для получения в !!Body!! надо добавить username:<имя_пользователя> password:<пароль> 
-        /// После получение токена access_token, его надо прибавить к 'Bearer '+<token> т.е. в Headers -> Authorization:Bearer eyJhbGciOiJIUzI1NiIsIw....
+        ///     Для получения в !!Body!! надо добавить username:
+        ///     <имя_пользователя>
+        ///         password:
+        ///         <пароль>
+        ///             После получение токена access_token, его надо прибавить к 'Bearer '+
+        ///             <token> т.е. в Headers -> Authorization:Bearer eyJhbGciOiJIUzI1NiIsIw....
         /// </summary>
         [HttpPost("/token")]
         [ProducesResponseType(typeof(IEnumerable<AuthResponse>), 200)]
@@ -46,14 +50,15 @@ namespace ServerTouristCompanyApi.Controllers
             var now = DateTime.UtcNow;
             // создаем JWT-токен
             var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                AuthOptions.ISSUER,
+                AuthOptions.AUDIENCE,
+                notBefore: now,
+                claims: identity.Claims,
+                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
+                    SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            List<Claim> list = (List<Claim>) identity.Claims;
+            var list = (List<Claim>) identity.Claims;
             var response = new
             {
                 access_token = encodedJwt,
@@ -63,12 +68,13 @@ namespace ServerTouristCompanyApi.Controllers
 
             // сериализация ответа
             Response.ContentType = "application/json";
-            await Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
+            await Response.WriteAsync(JsonConvert.SerializeObject(response,
+                new JsonSerializerSettings {Formatting = Formatting.Indented}));
         }
 
         private ClaimsIdentity GetIdentity(string username, string password)
         {
-            Person person = people.FirstOrDefault(x => x.Login == username && x.Password == password);
+            var person = people.FirstOrDefault(x => x.Login == username && x.Password == password);
             if (person != null)
             {
                 var claims = new List<Claim>
@@ -76,9 +82,9 @@ namespace ServerTouristCompanyApi.Controllers
                     new Claim(ClaimsIdentity.DefaultNameClaimType, person.Login),
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role)
                 };
-                ClaimsIdentity claimsIdentity =
-                new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
-                    ClaimsIdentity.DefaultRoleClaimType);
+                var claimsIdentity =
+                    new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                        ClaimsIdentity.DefaultRoleClaimType);
                 return claimsIdentity;
             }
 

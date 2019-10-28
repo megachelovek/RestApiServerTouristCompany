@@ -9,10 +9,7 @@ namespace ServerTouristCompanyApi.Binders
     {
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (bindingContext == null)
-            {
-                throw new ArgumentNullException(nameof(bindingContext));
-            }
+            if (bindingContext == null) throw new ArgumentNullException(nameof(bindingContext));
 
             // Check the value sent in
             var valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);

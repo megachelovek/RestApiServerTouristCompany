@@ -7,8 +7,8 @@ namespace ServerTouristCompanyApi.Middleware
 {
     public class RequestValidationMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly ILogger _logger;
+        private readonly RequestDelegate _next;
 
         public RequestValidationMiddleware(RequestDelegate next, ILogger<RequestValidationMiddleware> logger)
         {
@@ -25,7 +25,8 @@ namespace ServerTouristCompanyApi.Middleware
 
             stopwatch.Stop();
 
-            _logger.LogTrace($"Method: {context.Request.Method}; Path: {context.Request.Path} Execution time: {stopwatch.ElapsedMilliseconds}[ms]");
+            _logger.LogTrace(
+                $"Method: {context.Request.Method}; Path: {context.Request.Path} Execution time: {stopwatch.ElapsedMilliseconds}[ms]");
         }
     }
 }

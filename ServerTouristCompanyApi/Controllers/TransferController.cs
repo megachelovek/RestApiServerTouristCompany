@@ -18,17 +18,17 @@ using Swashbuckle.AspNetCore.Filters;
 namespace ServerTouristCompanyApi.Controllers
 {
     /// <summary>
-    ///     Tour controller.
+    ///     Transfer controller.
     /// </summary>
     [Route("api/[controller]")]
-    public class TourController : ControllerBase
+    public class TransferController : ControllerBase
     {
         private readonly ConnectionStrings _connectionStrings;
         private readonly ILogger _logger;
-        private readonly ITourService _service;
+        private readonly ITransferService _service;
 
         /// <summary>
-        ///     Creates new instance of <see cref="TourController" />.
+        ///     Creates new instance of <see cref="TransferController" />.
         /// </summary>
         /// <param name="connectionStrings">
         ///     Instance of <see cref="IOptionsSnapshot{TOptions}" /> object that contains connection string.
@@ -36,10 +36,10 @@ namespace ServerTouristCompanyApi.Controllers
         ///     https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.options.ioptionssnapshot-1?view=aspnetcore-2.1
         ///     TODO: https://www.strathweb.com/2016/09/strongly-typed-configuration-in-asp-net-core-without-ioptionst/
         /// </param>
-        /// <param name="service">Instance of <see cref="ITourService" /></param>
+        /// <param name="service">Instance of <see cref="ITransferService" /></param>
         /// <param name="logger"></param>
-        public TourController(IOptionsSnapshot<ConnectionStrings> connectionStrings, ITourService service,
-            ILogger<TourController> logger)
+        public TransferController(IOptionsSnapshot<ConnectionStrings> connectionStrings, ITransferService service,
+            ILogger<TransferController> logger)
         {
             _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
             _service = service ?? throw new ArgumentNullException(nameof(service));
@@ -47,28 +47,28 @@ namespace ServerTouristCompanyApi.Controllers
         }
 
         /// <summary>
-        ///     Tries to create a new Tour.
+        ///     Tries to create a new Transfer.
         /// </summary>
-        /// <param name="Tour">Instance of <see cref="Tour" />.</param>
-        /// <response code="200">Tour created.</response>
+        /// <param name="Transfer">Instance of <see cref="Transfer" />.</param>
+        /// <response code="200">Transfer created.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpPost(Name = "PostTour")]
+        [HttpPost(Name = "PostTransfer")]
         [ProducesResponseType(typeof(int), 201)]
         [ProducesResponseType(500)]
-        [SwaggerRequestExample(typeof(Tour), typeof(TourRequestExample))]
+        [SwaggerRequestExample(typeof(Transfer), typeof(TransferRequestExample))]
         [Authorize(AuthenticationSchemes =
             JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Post([FromBody] Tour Tour)
+        public async Task<IActionResult> Post([FromBody] Transfer Transfer)
         {
-            var response = await _service.Create(Tour);
+            var response = await _service.Create(Transfer);
 
             return CreatedAtRoute("getById", new {id = response}, response);
         }
 
         /// <summary>
-        ///     Tries to create a new Tour file.
+        ///     Tries to create a new Transfer file.
         /// </summary>
-        /// <param name="Tour">Instance of <see cref="Tour" />.</param>
+        /// <param name="Transfer">Instance of <see cref="Transfer" />.</param>
         /// <param name="file">A file content</param>
         /// <returns></returns>
         [HttpPost("content")]
@@ -80,7 +80,7 @@ namespace ServerTouristCompanyApi.Controllers
         // Since we are using custom model provider this post method doesn't support swagger request examples
         // I guess this can be coded to be supported, but I feel it will go beyond this template's boundaries.
         public async Task<IActionResult> PostFile([ModelBinder(BinderType = typeof(JsonModelBinder))]
-            Tour Tour, IFormFile file)
+            Transfer Transfer, IFormFile file)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -90,42 +90,42 @@ namespace ServerTouristCompanyApi.Controllers
                 await System.IO.File.WriteAllBytesAsync(path, memoryStream.ToArray());
             }
 
-            var response = await _service.Create(Tour);
+            var response = await _service.Create(Transfer);
 
             return CreatedAtRoute("getById", new {id = response}, response);
         }
 
         /// <summary>
-        ///     Tries to retrieve all Tour objects.
+        ///     Tries to retrieve all Transfer objects.
         /// </summary>
-        /// <response code="200">All available Tour objects retrieved.</response>
+        /// <response code="200">All available Transfer objects retrieved.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet(Name = "GetTour")]
+        [HttpGet(Name = "GetTransfer")]
         [ResponseCache(CacheProfileName = "default")]
-        [ProducesResponseType(typeof(IEnumerable<Tour>), 200)]
-        [SwaggerResponseExample(200, typeof(TourResponseExample))]
+        [ProducesResponseType(typeof(IEnumerable<Transfer>), 200)]
+        [SwaggerResponseExample(200, typeof(TransferResponseExample))]
         [Authorize(AuthenticationSchemes =
             JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Get()
         {
             var response = await _service.Get().ConfigureAwait(false);
 
-            var tours = (List<Tour>) new TourListResponseExample().GetExamples();
+            var Transfers = (List<Transfer>) new TransferListResponseExample().GetExamples();
 
-            return Ok(tours);
+            return Ok(Transfers);
         }
 
         /// <summary>
-        ///     Tries to retrieve specified Tour.
+        ///     Tries to retrieve specified Transfer.
         /// </summary>
         /// <param name="id">Unique identifier.</param>
-        /// <response code="200">Tour successfully retrieved.</response>
-        /// <response code="404">Specified Tour doesn't exist.</response>
+        /// <response code="200">Transfer successfully retrieved.</response>
+        /// <response code="404">Specified Transfer doesn't exist.</response>
         /// <response code="500">Internal server error.</response>
-        [HttpGet("{id:int:min(1)}", Name = "getByIdTour")]
-        [ProducesResponseType(typeof(Tour), 200)]
+        [HttpGet("{id:int:min(1)}", Name = "getByIdTransfer")]
+        [ProducesResponseType(typeof(Transfer), 200)]
         [ProducesResponseType(404)]
-        [SwaggerResponseExample(200, typeof(TourListResponseExample))]
+        [SwaggerResponseExample(200, typeof(TransferListResponseExample))]
         [Authorize(AuthenticationSchemes =
             JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Get(int id)
@@ -139,27 +139,27 @@ namespace ServerTouristCompanyApi.Controllers
         }
 
         /// <summary>
-        ///     Tries to update the Tour.
+        ///     Tries to update the Transfer.
         /// </summary>
-        /// <param name="Tour">Instance of <see cref="Tour" /> that holds values that we want updated.</param>
-        /// <response code="200">Tour updated successfully.</response>
+        /// <param name="Transfer">Instance of <see cref="Transfer" /> that holds values that we want updated.</param>
+        /// <response code="200">Transfer updated successfully.</response>
         /// <response code="500">Internal server error.</response>
         [HttpPatch]
-        [SwaggerRequestExample(typeof(Tour), typeof(TourRequestExample))]
+        [SwaggerRequestExample(typeof(Transfer), typeof(TransferRequestExample))]
         [Authorize(AuthenticationSchemes =
             JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Patch([FromBody] Tour Tour)
+        public async Task<IActionResult> Patch([FromBody] Transfer Transfer)
         {
-            await _service.Update(Tour).ConfigureAwait(false);
+            await _service.Update(Transfer).ConfigureAwait(false);
 
             return Ok();
         }
 
         /// <summary>
-        ///     Tires to delete specified Tour.
+        ///     Tires to delete specified Transfer.
         /// </summary>
         /// <param name="id">Unique identifier.</param>
-        /// <response code="200">Tour deleted successfully.</response>
+        /// <response code="200">Transfer deleted successfully.</response>
         /// <response code="500">Internal server error.</response>
         [HttpDelete("{id:int:min(1)}")]
         [Authorize(AuthenticationSchemes =

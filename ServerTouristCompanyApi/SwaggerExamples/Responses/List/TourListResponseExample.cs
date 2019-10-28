@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using ServerTouristCompanyApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
-namespace ServerTouristCompanyApi.Services
+namespace ServerTouristCompanyApi.SwaggerExamples
 {
-    internal class TourService : ITourService
+    public class TourListResponseExample : IExamplesProvider
     {
-        public Task<int> Create(Tour Tour)
+        public object GetExamples()
         {
-            return Task.FromResult(new Random().Next());
-        }
-
-        public Task<IEnumerable<Tour>> Get()
-        {
-            return Task.FromResult<IEnumerable<Tour>>(new List<Tour>
+            return new List<Tour>
             {
                 new Tour
                 {
@@ -36,30 +31,7 @@ namespace ServerTouristCompanyApi.Services
                     Description = "Объезд всех аниме-студий Токио", FromCity = "Москва, Россия", Price = 120000,
                     ToCity = "Токио, Япония"
                 }
-            });
-        }
-
-        public Task<Tour> Get(int id)
-        {
-            if (id == 0)
-                return Task.FromResult<Tour>(null);
-
-            return Task.FromResult(new Tour
-            {
-                Id = 2, Name = "Пеший тур в Болгарию", Create = new DateTime(2019, 3, 3),
-                Description = "Тур по городам Болгарии ", FromCity = "Москва, Россия", Price = 20000,
-                ToCity = "София, Болгария"
-            });
-        }
-
-        public Task Update(Tour Tour)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(int id)
-        {
-            return Task.CompletedTask;
+            };
         }
     }
 }
