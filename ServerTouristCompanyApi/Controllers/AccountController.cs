@@ -36,8 +36,8 @@ namespace ServerTouristCompanyApi.Controllers
         [ProducesResponseType(500)]
         public async Task Token()
         {
-            var username = Request.Form["username"];
-            var password = Request.Form["password"];
+            var username = HttpContext.Request.Query["username"].ToString();
+            var password = HttpContext.Request.Query["password"].ToString();
 
             var identity = GetIdentity(username, password);
             if (identity == null)
