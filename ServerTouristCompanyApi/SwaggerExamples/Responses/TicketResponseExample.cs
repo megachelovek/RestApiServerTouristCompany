@@ -8,12 +8,11 @@ namespace ServerTouristCompanyApi.SwaggerExamples
     {
         public object GetExamples()
         {
-            return new Ticket
-            {
-                Id = 2, DateTimeDeparture = new DateTime(2019, 8, 9, 2, 20, 0),
-                DateTimeArrival = new DateTime(2019, 8, 10, 1, 20, 0), PlaceArrival = "Аэропорт имени Фуу",
-                PlaceDeparture = "Аэропорт имени Аски"
-            };
+            return new Ticket(
+                new DateTime(2019, 8, 1, 6, 20, 0),
+                new DateTime(2019, 8, 2, 4, 20, 0), 2, "Аэропорт имени Аски",
+                "Аэропорт Курумоч", "123"
+            );
         }
     }
 }

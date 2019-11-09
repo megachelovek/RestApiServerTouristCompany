@@ -10,7 +10,7 @@ namespace ServerTouristCompanyApi.Models
         /// <summary>
         ///     Дата и время встречи
         /// </summary>
-        public DateTime DateTimeMeet { get; set; }
+        public DateTime DateTimeNearTransfer { get; set; }
 
         /// <summary>
         ///     Идентификатор
@@ -20,11 +20,11 @@ namespace ServerTouristCompanyApi.Models
         /// <summary>
         ///     Место встречи
         /// </summary>
-        public string PlaceMeet { get; set; }
+        public string PlaceNearTransfer { get; set; }
 
         /// <summary>
         ///     Билет к этому трансферу
         /// </summary>
-        public int IdTicket { get; set; }
+        public Ticket Ticket { get; set; }
     }
 }

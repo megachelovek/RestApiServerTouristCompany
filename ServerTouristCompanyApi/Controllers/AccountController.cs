@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,11 +19,7 @@ namespace ServerTouristCompanyApi.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly List<Person> people = new List<Person>
-        {
-            new Person {Login = "admin", Password = "admin", Role = "admin"},
-            new Person {Login = "qwerty", Password = "55555", Role = "user"}
-        };
+        private readonly List<Person> people = new List<Person>(new Person[] { new Person("qwerty", "55555", "user", "name", "address", "phone", new DateTime(2019, 8, 1, 6, 20, 0)), new Person("admin", "admin", "admin", "nameAdmin", "address", "phone", new DateTime(2019, 8, 1, 6, 20, 0)) });
 
         /// <summary>
         ///     Для получения в !!Body!! надо добавить username:
@@ -58,7 +57,7 @@ namespace ServerTouristCompanyApi.Controllers
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
                     SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            var list = (List<Claim>) identity.Claims;
+            var list = (List<Claim>)identity.Claims;
             var response = new
             {
                 access_token = encodedJwt,
@@ -69,7 +68,37 @@ namespace ServerTouristCompanyApi.Controllers
             // сериализация ответа
             Response.ContentType = "application/json";
             await Response.WriteAsync(JsonConvert.SerializeObject(response,
-                new JsonSerializerSettings {Formatting = Formatting.Indented}));
+                new JsonSerializerSettings { Formatting = Formatting.Indented }));
+        }
+
+        [HttpGet("/GetAllClients")]
+        [ResponseCache(CacheProfileName = "default")]
+        [ProducesResponseType(typeof(IEnumerable<Transfer>), 200)]
+        [SwaggerResponseExample(200, typeof(TransferResponseExample))]
+        [Authorize(AuthenticationSchemes =
+           JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
+        public async Task<IActionResult> Get()
+        {
+            var persons = people.Where(x => !x.Login.Equals("admin")).Select(x => { x.Password = ""; return x; }).ToList();
+
+            return Ok(persons);
+        }
+
+        [HttpGet("/GetClients")]
+        [Authorize(AuthenticationSchemes =
+           JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetClients(string login)
+        {
+            var result = people.Where(x => x.Login.Equals(login)).Select(x => { x.Password = ""; return x; }).First();
+
+            return Ok(result);
+        }
+
+        [HttpPost("/updateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] Person person)
+        {
+            people.Where(x => x.Login.Equals(person.Login)).ToList().ForEach(x => { x.Name = person.Name; x.Phone = person.Phone; x.Address = person.Address; });
+            return Ok(null);
         }
 
         private ClaimsIdentity GetIdentity(string username, string password)

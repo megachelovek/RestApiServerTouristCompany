@@ -55,7 +55,6 @@ namespace ServerTouristCompanyApi
                     .Build();
 
             services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"));
-
             services.AddLogging();
 
             // Register your types
@@ -71,7 +70,6 @@ namespace ServerTouristCompanyApi
                 b.WithOrigins("*").WithMethods("*").WithHeaders("*").AllowCredentials().Build();
             }
 
-            ;
             services.AddCors(options => { options.AddPolicy("AllowAllPolicy", build); });
 
             ///JWT Bearer

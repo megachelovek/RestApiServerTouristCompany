@@ -57,7 +57,7 @@ namespace ServerTouristCompanyApi.Controllers
         [ProducesResponseType(500)]
         [SwaggerRequestExample(typeof(Transfer), typeof(TransferRequestExample))]
         [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Post([FromBody] Transfer Transfer)
         {
             var response = await _service.Create(Transfer);
@@ -163,7 +163,7 @@ namespace ServerTouristCompanyApi.Controllers
         /// <response code="500">Internal server error.</response>
         [HttpDelete("{id:int:min(1)}")]
         [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.Delete(id).ConfigureAwait(false);

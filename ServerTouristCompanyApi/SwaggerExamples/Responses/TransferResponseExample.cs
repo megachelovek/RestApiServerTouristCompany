@@ -10,8 +10,10 @@ namespace ServerTouristCompanyApi.SwaggerExamples
         {
             return new Transfer
             {
-                Id = 1, DateTimeMeet = new DateTime(2019, 8, 1, 6, 20, 0), IdTicket = 1,
-                PlaceMeet = "Аэропорт имени Аски из Евангелиона"
+                Id = 1,
+                DateTimeNearTransfer = new DateTime(2019, 8, 1, 6, 20, 0),
+                Ticket = new Ticket(DateTime.Now, DateTime.Now, 1, "qwe", "asd", "123"),
+                PlaceNearTransfer = "Аэропорт имени Аски из Евангелиона"
             };
         }
     }

@@ -11,22 +11,22 @@ namespace ServerTouristCompanyApi.SwaggerExamples
         {
             return new List<Transfer>
             {
-                new Transfer
+               new Transfer
                 {
-                    Id = 1, DateTimeMeet = new DateTime(2019, 8, 1, 6, 20, 0), IdTicket = 1,
-                    PlaceMeet = "Аэропорт имени Аски из Евангелиона"
+                    Id = 1, DateTimeNearTransfer = new DateTime(2019, 8, 1, 6, 20, 0), Ticket = new Ticket(DateTime.Now, DateTime.Now, 1, "qwe", "asd", "123"),
+                    PlaceNearTransfer = "Аэропорт имени Аски из Евангелиона"
                 },
 
                 new Transfer
                 {
-                    Id = 2, DateTimeMeet = new DateTime(2019, 8, 1, 8, 20, 0), IdTicket = 2,
-                    PlaceMeet = "Аэропорт имени Фуу из Самурая Чамплу"
+                    Id = 2, DateTimeNearTransfer = new DateTime(2019, 8, 1, 8, 20, 0), Ticket = new Ticket(DateTime.Now, DateTime.Now, 2, "qwe", "asd", "123"),
+                    PlaceNearTransfer = "Аэропорт имени Фуу из Самурая Чамплу"
                 },
 
                 new Transfer
                 {
-                    Id = 3, DateTimeMeet = new DateTime(2019, 8, 1, 9, 20, 0), IdTicket = 3,
-                    PlaceMeet = "Вокзал имени Спайка из Ковбоя Бибопа"
+                    Id = 3, DateTimeNearTransfer = new DateTime(2019, 8, 1, 9, 20, 0), Ticket = new Ticket(DateTime.Now, DateTime.Now, 3, "qwe", "asd", "123"),
+                    PlaceNearTransfer = "Вокзал имени Спайка из Ковбоя Бибопа"
                 }
             };
         }

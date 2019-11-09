@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ServerTouristCompanyApi.Binders;
 using ServerTouristCompanyApi.Configuration;
+using ServerTouristCompanyApi.DAO;
 using ServerTouristCompanyApi.Models;
 using ServerTouristCompanyApi.Services;
 using ServerTouristCompanyApi.SwaggerExamples;
@@ -57,12 +59,11 @@ namespace ServerTouristCompanyApi.Controllers
         [ProducesResponseType(500)]
         [SwaggerRequestExample(typeof(Ticket), typeof(TicketRequestExample))]
         [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Post([FromBody] Ticket Ticket)
         {
-            var response = await _service.Create(Ticket);
-
-            return CreatedAtRoute("getById", new {id = response}, response);
+            TicketRepository.Add(Ticket);
+            return Ok();
         }
 
         /// <summary>
@@ -110,9 +111,7 @@ namespace ServerTouristCompanyApi.Controllers
         {
             var response = await _service.Get().ConfigureAwait(false);
 
-            var Tickets = (List<Ticket>) new TicketListResponseExample().GetExamples();
-
-            return Ok(Tickets);
+            return Ok(TicketRepository.FindAll());
         }
 
         /// <summary>
@@ -136,6 +135,16 @@ namespace ServerTouristCompanyApi.Controllers
                 return NotFound(id);
 
             return Ok(response);
+        }
+
+        [HttpGet("/GetTicket")]
+        [Authorize(AuthenticationSchemes =
+           JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetTicket(int id)
+        {
+            var result = new Ticket(DateTime.Now, DateTime.Now, 1, "q", "2", "d");
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -163,7 +172,7 @@ namespace ServerTouristCompanyApi.Controllers
         /// <response code="500">Internal server error.</response>
         [HttpDelete("{id:int:min(1)}")]
         [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.Delete(id).ConfigureAwait(false);
