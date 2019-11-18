@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ServerTouristCompanyApi.Binders;
 using ServerTouristCompanyApi.Configuration;
+using ServerTouristCompanyApi.DAO;
 using ServerTouristCompanyApi.Models;
 using ServerTouristCompanyApi.Services;
 using ServerTouristCompanyApi.SwaggerExamples;
@@ -58,41 +59,11 @@ namespace ServerTouristCompanyApi.Controllers
         [SwaggerRequestExample(typeof(Transfer), typeof(TransferRequestExample))]
         [Authorize(AuthenticationSchemes =
             JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
-        public async Task<IActionResult> Post([FromBody] Transfer Transfer)
+        public async Task<IActionResult> Post([FromBody] Transfer transfer)
         {
-            var response = await _service.Create(Transfer);
+            var response = await TransferRepository.Add(transfer);
 
-            return CreatedAtRoute("getById", new {id = response}, response);
-        }
-
-        /// <summary>
-        ///     Tries to create a new Transfer file.
-        /// </summary>
-        /// <param name="Transfer">Instance of <see cref="Transfer" />.</param>
-        /// <param name="file">A file content</param>
-        /// <returns></returns>
-        [HttpPost("content")]
-        [ProducesResponseType(typeof(int), 201)]
-        [ProducesResponseType(500)]
-        [AddSwaggerFileUploadButton]
-        [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
-        // Since we are using custom model provider this post method doesn't support swagger request examples
-        // I guess this can be coded to be supported, but I feel it will go beyond this template's boundaries.
-        public async Task<IActionResult> PostFile([ModelBinder(BinderType = typeof(JsonModelBinder))]
-            Transfer Transfer, IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.OpenReadStream().CopyToAsync(memoryStream);
-
-                var path = Path.Combine(Path.GetTempPath(), file.FileName);
-                await System.IO.File.WriteAllBytesAsync(path, memoryStream.ToArray());
-            }
-
-            var response = await _service.Create(Transfer);
-
-            return CreatedAtRoute("getById", new {id = response}, response);
+            return Ok(response);
         }
 
         /// <summary>
@@ -108,11 +79,9 @@ namespace ServerTouristCompanyApi.Controllers
             JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Get()
         {
-            var response = await _service.Get().ConfigureAwait(false);
+            var response = await TransferRepository.GetAll();
 
-            var Transfers = (List<Transfer>) new TransferListResponseExample().GetExamples();
-
-            return Ok(Transfers);
+            return Ok(response);
         }
 
         /// <summary>
@@ -127,32 +96,15 @@ namespace ServerTouristCompanyApi.Controllers
         [ProducesResponseType(404)]
         [SwaggerResponseExample(200, typeof(TransferListResponseExample))]
         [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Get(int id)
         {
-            var response = await _service.Get(id).ConfigureAwait(false);
+            var response = await TransferRepository.GetByID(id);
 
-            if (response == null)
-                return NotFound(id);
+            /*if (response == null)
+                return NotFound(id);*/
 
             return Ok(response);
-        }
-
-        /// <summary>
-        ///     Tries to update the Transfer.
-        /// </summary>
-        /// <param name="Transfer">Instance of <see cref="Transfer" /> that holds values that we want updated.</param>
-        /// <response code="200">Transfer updated successfully.</response>
-        /// <response code="500">Internal server error.</response>
-        [HttpPatch]
-        [SwaggerRequestExample(typeof(Transfer), typeof(TransferRequestExample))]
-        [Authorize(AuthenticationSchemes =
-            JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Patch([FromBody] Transfer Transfer)
-        {
-            await _service.Update(Transfer).ConfigureAwait(false);
-
-            return Ok();
         }
 
         /// <summary>
@@ -166,9 +118,35 @@ namespace ServerTouristCompanyApi.Controllers
             JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _service.Delete(id).ConfigureAwait(false);
+            int result;
+            try
+            {
+                result = await TransferRepository.Remove(id);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
 
-            return Ok();
+            return Ok(result);
+        }
+
+        /// <summary>
+        ///     Tries to update a Transfer.
+        /// </summary>
+        /// <param name="transfer">Instance of <see cref="Transfer" />.</param>
+        /// <response code="200">Ticket created.</response>
+        /// <response code="500">Internal server error.</response>
+        [HttpPut]
+        [ProducesResponseType(typeof(int), 201)]
+        [ProducesResponseType(500)]
+        [SwaggerRequestExample(typeof(Ticket), typeof(TicketRequestExample))]
+        [Authorize(AuthenticationSchemes =
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
+        public async Task<IActionResult> Update([FromBody] Transfer transfer)
+        {
+            var result = await TransferRepository.Update(transfer);
+            return Ok(result);
         }
     }
 }

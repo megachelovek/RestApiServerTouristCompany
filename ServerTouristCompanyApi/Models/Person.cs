@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServerTouristCompanyApi.Models
 {
@@ -19,6 +20,7 @@ namespace ServerTouristCompanyApi.Models
             RegistrationTime = registrationTime;
         }
 
+        [Key]
         public string Login { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }

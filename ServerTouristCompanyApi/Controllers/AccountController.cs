@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using ServerTouristCompanyApi.DAO;
 using ServerTouristCompanyApi.Models;
 using ServerTouristCompanyApi.SwaggerExamples;
 using Swashbuckle.AspNetCore.Filters;
@@ -19,8 +20,6 @@ namespace ServerTouristCompanyApi.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly List<Person> people = new List<Person>(new Person[] { new Person("qwerty", "55555", "user", "name", "address", "phone", new DateTime(2019, 8, 1, 6, 20, 0)), new Person("admin", "admin", "admin", "nameAdmin", "address", "phone", new DateTime(2019, 8, 1, 6, 20, 0)) });
-
         /// <summary>
         ///     Для получения в !!Body!! надо добавить username:
         ///     <имя_пользователя>
@@ -38,7 +37,7 @@ namespace ServerTouristCompanyApi.Controllers
             var username = HttpContext.Request.Query["username"].ToString();
             var password = HttpContext.Request.Query["password"].ToString();
 
-            var identity = GetIdentity(username, password);
+            var identity = await GetIdentity(username, password);
             if (identity == null)
             {
                 Response.StatusCode = 400;
@@ -79,7 +78,8 @@ namespace ServerTouristCompanyApi.Controllers
            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
         public async Task<IActionResult> Get()
         {
-            var persons = people.Where(x => !x.Login.Equals("admin")).Select(x => { x.Password = ""; return x; }).ToList();
+            var persons = await ClientRepository.GetAll();
+            persons = persons.Select(x => { x.Password = ""; return x; }).ToList();
 
             return Ok(persons);
         }
@@ -89,7 +89,8 @@ namespace ServerTouristCompanyApi.Controllers
            JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetClients(string login)
         {
-            var result = people.Where(x => x.Login.Equals(login)).Select(x => { x.Password = ""; return x; }).First();
+            var result = await ClientRepository.GetByID(login);
+            result.Password = "";
 
             return Ok(result);
         }
@@ -97,14 +98,48 @@ namespace ServerTouristCompanyApi.Controllers
         [HttpPost("/updateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] Person person)
         {
-            people.Where(x => x.Login.Equals(person.Login)).ToList().ForEach(x => { x.Name = person.Name; x.Phone = person.Phone; x.Address = person.Address; });
-            return Ok(null);
+            var result = await ClientRepository.Update(person);
+            return Ok(result);
         }
 
-        private ClaimsIdentity GetIdentity(string username, string password)
+        [HttpPost("/registration")]
+        public async Task<IActionResult> Registration([FromBody] Person person)
         {
-            var person = people.FirstOrDefault(x => x.Login == username && x.Password == password);
-            if (person != null)
+            var result = await ClientRepository.Add(person);
+            if(result == 1)
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
+
+        [HttpDelete("/deleteClient")]
+        [Authorize(AuthenticationSchemes =
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
+        public async Task<IActionResult> Delete(string login)
+        {
+            var result = await ClientRepository.Remove(login);
+
+            return Ok(result);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(typeof(int), 201)]
+        [ProducesResponseType(500)]
+        [SwaggerRequestExample(typeof(Ticket), typeof(TicketRequestExample))]
+        [Authorize(AuthenticationSchemes =
+            JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
+        public async Task<IActionResult> Update([FromBody] Person person)
+        {
+            var result = await ClientRepository.Update(person);
+            return Ok(result);
+        }
+
+        private async Task<ClaimsIdentity> GetIdentity(string username, string password)
+        {
+            var person = await ClientRepository.GetByID(username);
+            if (person != null && person.Password == password)
             {
                 var claims = new List<Claim>
                 {

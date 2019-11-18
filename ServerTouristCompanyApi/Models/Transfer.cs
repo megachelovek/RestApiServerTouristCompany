@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ServerTouristCompanyApi.Models
 {
@@ -7,6 +9,15 @@ namespace ServerTouristCompanyApi.Models
     /// </summary>
     public class Transfer
     {
+        public Transfer() { }
+        public Transfer(DateTime dateTimeNearTransfer, int id, string placeNearTransfer, Ticket ticket)
+        {
+            DateTimeNearTransfer = dateTimeNearTransfer;
+            Id = id;
+            PlaceNearTransfer = placeNearTransfer;
+            Ticket = ticket;
+        }
+
         /// <summary>
         ///     Дата и время встречи
         /// </summary>
@@ -15,6 +26,8 @@ namespace ServerTouristCompanyApi.Models
         /// <summary>
         ///     Идентификатор
         /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
@@ -25,6 +38,7 @@ namespace ServerTouristCompanyApi.Models
         /// <summary>
         ///     Билет к этому трансферу
         /// </summary>
+        [ForeignKey("ticketFK")]
         public Ticket Ticket { get; set; }
     }
 }

@@ -20,51 +20,54 @@ namespace ServerTouristCompanyApi.DAO
             }
         }
 
-        public static void Add(Ticket item)
+        public static async Task<int> Add(Ticket item)
         {
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
-                dbConnection.Execute("INSERT INTO ticket (\"DatetimeOfDepartureTicket\",\"DatetimeOfArrivalTicket\",\"PlaceOfDepartureTicket\",\"PointOfArrivalTicket\",\"DataTicket\") " +
-                    "VALUES(@DatetimeOfDepartureTicket,@DatetimeOfArrivalTicket,@PlaceOfDepartureTicket,@PointOfArrivalTicket,@DataTicket)", item);
+                return dbConnection.ExecuteAsync("INSERT INTO ticket (\"DatetimeOfDepartureTicket\",\"DatetimeOfArrivalTicket\",\"PlaceOfDepartureTicket\",\"PointOfArrivalTicket\",\"DataTicket\") " +
+                    "VALUES(@DatetimeOfDepartureTicket,@DatetimeOfArrivalTicket,@PlaceOfDepartureTicket,@PointOfArrivalTicket,@DataTicket)", item).Result;
             }
 
         }
 
-        public static IEnumerable<Ticket> FindAll()
+        public static async Task<IEnumerable<Ticket>> GetAll()
         {
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
-                var a = dbConnection.Query<Ticket>("SELECT * FROM ticket");
-                return a;
+                return dbConnection.QueryAsync<Ticket>("SELECT * FROM ticket").Result;
             }
         }
 
-        public Ticket FindByID(int id)
+        public static async Task<Ticket> GetByID(int id)
         {
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
-                return dbConnection.Query<Ticket>("SELECT * FROM customer WHERE id = @Id", new { Id = id }).FirstOrDefault();
+                return dbConnection.QueryAsync<Ticket>("SELECT * FROM ticket WHERE \"Id\" = @Id", new { Id = id }).Result.FirstOrDefault();
             }
         }
 
-        public void Remove(int id)
+        public static async Task<int> Remove(int id)
         {
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
-                dbConnection.Execute("DELETE FROM customer WHERE Id=@Id", new { Id = id });
+                return dbConnection.ExecuteAsync("DELETE FROM ticket WHERE \"Id\"=@Id", new { Id = id }).Result;
             }
         }
 
-        public void Update(Ticket item)
+        public static Task<int> Update(Ticket item)
         {
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
-                dbConnection.Query("UPDATE customer SET name = @Name,  phone  = @Phone, email= @Email, address= @Address WHERE id = @Id", item);
+                return dbConnection.ExecuteAsync("UPDATE ticket SET \"DatetimeOfDepartureTicket\" = @DatetimeOfDepartureTicket, " +
+                    "\"DatetimeOfArrivalTicket\" = @DatetimeOfArrivalTicket," +
+                    "\"PlaceOfDepartureTicket\" = @PlaceOfDepartureTicket," +
+                    "\"PointOfArrivalTicket\" = @PointOfArrivalTicket," +
+                    "\"DataTicket\" = @DataTicket WHERE \"Id\" = @Id", item);
             }
         }
     }
