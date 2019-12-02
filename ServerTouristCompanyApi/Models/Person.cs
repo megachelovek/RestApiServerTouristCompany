@@ -9,7 +9,8 @@ namespace ServerTouristCompanyApi.Models
         {
         }
 
-        public Person(string login, string password, string role, string name, string address, string phone, DateTime registrationTime)
+        public Person(string login, string password, string role, 
+            string name, string address, string phone, DateTime registrationTime)
         {
             Login = login;
             Password = password;

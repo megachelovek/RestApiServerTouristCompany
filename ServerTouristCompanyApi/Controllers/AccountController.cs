@@ -42,6 +42,7 @@ namespace ServerTouristCompanyApi.Controllers
             {
                 Response.StatusCode = 400;
                 await Response.WriteAsync("Invalid username or password.");
+                Log.WriteWebLog("AccountController: username: " + username + ";" + " password: " + password + "|->" + "Invalid username or password.");
                 return;
             }
 
@@ -66,7 +67,8 @@ namespace ServerTouristCompanyApi.Controllers
 
             // сериализация ответа
             Response.ContentType = "application/json";
-            await Response.WriteAsync(JsonConvert.SerializeObject(response,
+           Log.WriteWebLog("AccountController:  200 OK " + response.ToString());
+           await Response.WriteAsync(JsonConvert.SerializeObject(response,
                 new JsonSerializerSettings { Formatting = Formatting.Indented }));
         }
 
@@ -80,7 +82,7 @@ namespace ServerTouristCompanyApi.Controllers
         {
             var persons = await ClientRepository.GetAll();
             persons = persons.Select(x => { x.Password = ""; return x; }).ToList();
-
+            Log.WriteWebLog("AccountController: GetAllClients: Success");
             return Ok(persons);
         }
 
@@ -99,6 +101,8 @@ namespace ServerTouristCompanyApi.Controllers
         public async Task<IActionResult> UpdateUser([FromBody] Person person)
         {
             var result = await ClientRepository.Update(person);
+            Log.WriteWebLog("AccountController: updateUser: Success");
+
             return Ok(result);
         }
 
@@ -108,6 +112,8 @@ namespace ServerTouristCompanyApi.Controllers
             var result = await ClientRepository.Add(person);
             if(result == 1)
             {
+                Log.WriteWebLog("AccountController: registration: Success");
+
                 return Ok();
             }
 
@@ -120,6 +126,7 @@ namespace ServerTouristCompanyApi.Controllers
         public async Task<IActionResult> Delete(string login)
         {
             var result = await ClientRepository.Remove(login);
+            Log.WriteWebLog("AccountController: Delete: Success");
 
             return Ok(result);
         }
@@ -133,6 +140,8 @@ namespace ServerTouristCompanyApi.Controllers
         public async Task<IActionResult> Update([FromBody] Person person)
         {
             var result = await ClientRepository.Update(person);
+            Log.WriteWebLog("AccountController: Update: Success");
+
             return Ok(result);
         }
 
@@ -149,6 +158,8 @@ namespace ServerTouristCompanyApi.Controllers
                 var claimsIdentity =
                     new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                         ClaimsIdentity.DefaultRoleClaimType);
+                Log.WriteWebLog("AccountController: GetIdentity: token was generated");
+
                 return claimsIdentity;
             }
 
