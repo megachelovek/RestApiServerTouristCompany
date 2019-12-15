@@ -15,7 +15,7 @@ namespace ServerTouristCompanyApi.DAO
         {
             get
             {
-                return new NpgsqlConnection("User ID=postgres;Password=;Host=localhost;Port=5432;Database=transfers;Pooling=true;");
+                return new NpgsqlConnection(Repository.ConnectionSettings);
             }
         }
 
